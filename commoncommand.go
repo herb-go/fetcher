@@ -14,13 +14,23 @@ func URL(u *url.URL) Command {
 	})
 }
 
-//Method command which modify fetcher url to given url
+//Method command which modify fetcher method to given method
 type Method string
 
 //Exec exec command to modify fetcher.
 //Return any error if raised.
 func (m Method) Exec(f *Fetcher) error {
 	f.Method = string(m)
+	return nil
+}
+
+//PathPrefix command which modify fetcher url with given path prefix
+type PathPrefix string
+
+//Exec exec command to modify fetcher.
+//Return any error if raised.
+func (p PathPrefix) Exec(f *Fetcher) error {
+	f.URL.Path = f.URL.Path + string(p)
 	return nil
 }
 

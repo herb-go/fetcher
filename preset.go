@@ -27,6 +27,11 @@ func (p *Preset) Commands() []Command {
 	return []Command(*p)
 }
 
+//EndPoint create new preset with given pathprefix and method.
+func (p *Preset) EndPoint(pathprefix string, method string) *Preset {
+	return p.With(PathPrefix(pathprefix), Method(method))
+}
+
 //Fetch fetch http response.
 //Preset and commands will exec on new fetcher by which fetching response.
 //Return http response and any error if raised

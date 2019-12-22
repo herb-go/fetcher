@@ -20,19 +20,16 @@ func NewResponse(r *http.Response) *Response {
 type Parser interface {
 	//Parse parse response data.
 	//Return Respnse and any error if raised.
-	Parse(*Response, error) (*Response, error)
+	Parse(*Response) (*Response, error)
 }
 
-type ParserFunc func(resp *Response, err error) (*Response, error)
+type ParserFunc func(resp *Response) (*Response, error)
 
-func (p ParserFunc) Parse(resp *Response, err error) (*Response, error) {
-	return p(resp, err)
+func (p ParserFunc) Parse(resp *Response) (*Response, error) {
+	return p(resp)
 }
 
-var BytesParser = ParserFunc(func(resp *Response, err error) (*Response, error) {
-	if err != nil {
-		return resp, err
-	}
+var BytesParser = ParserFunc(func(resp *Response) (*Response, error) {
 	if resp.bytes != nil {
 		return resp, nil
 	}
@@ -47,8 +44,8 @@ var BytesParser = ParserFunc(func(resp *Response, err error) (*Response, error) 
 })
 
 func StringParser(str *string) Parser {
-	return ParserFunc(func(resp *Response, err error) (*Response, error) {
-		resp, err = BytesParser.Parse(resp, err)
+	return ParserFunc(func(resp *Response) (*Response, error) {
+		resp, err := BytesParser.Parse(resp)
 		if err != nil {
 			return resp, err
 		}
@@ -60,8 +57,8 @@ func StringParser(str *string) Parser {
 }
 
 func JSONParser(v interface{}) Parser {
-	return ParserFunc(func(resp *Response, err error) (*Response, error) {
-		resp, err = BytesParser.Parse(resp, err)
+	return ParserFunc(func(resp *Response) (*Response, error) {
+		resp, err := BytesParser.Parse(resp)
 		if err != nil {
 			return resp, err
 		}
