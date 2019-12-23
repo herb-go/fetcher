@@ -42,26 +42,26 @@ func (p *Preset) EndPoint(pathprefix string, method string) *Preset {
 	return p.With(PathPrefix(pathprefix), Method(method))
 }
 
-//Fetch fetch  response.
+//Fetch fetch request.
 //Preset and commands will exec on new fetcher by which fetching response.
 //Return http response and any error if raised.
 func (p *Preset) Fetch(cmds ...Command) (*Response, error) {
 	return Fetch(p.With(cmds...).Commands()...)
 }
 
-//FetchWithBody fetch response with given body.
+//FetchWithBody fetch request with given body.
 //Return http response and any error if raised.
 func (p *Preset) FetchWithBody(body io.Reader) (*Response, error) {
 	return p.Fetch(Body(body))
 }
 
-//FetchAndParse fetch response and prase response with given parser if no error raised.
+//FetchAndParse fetch request and prase response with given parser if no error raised.
 //Return response fetched and any error raised when fetching or parsing.
 func (p *Preset) FetchAndParse(preset Parser) (*Response, error) {
 	return FetchAndParse(p, preset)
 }
 
-//FetchWithBodyAndParse fetch response and prase response with given preset ,body and parser if no error raised.
+//FetchWithBodyAndParse fetch request and prase response with given preset ,body and parser if no error raised.
 //Return response fetched and any error raised when fetching or parsing.
 func (p *Preset) FetchWithBodyAndParse(body io.Reader, preset Parser) (*Response, error) {
 	return FetchWithBodyAndParse(p, body, preset)
@@ -125,5 +125,13 @@ func (s *Server) CreatePreset() (*Preset, error) {
 type PresetFactory interface {
 	//CreatePreset create new preset.
 	//Return preset created and any error raised.
-	CreateFetcher() (*Preset, error)
+	CreatePreset() (*Preset, error)
+}
+
+func MustPreset(f PresetFactory) *Preset {
+	p, err := f.CreatePreset()
+	if err != nil {
+		panic(err)
+	}
+	return p
 }

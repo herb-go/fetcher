@@ -3,51 +3,7 @@ package fetcher
 import (
 	"encoding/json"
 	"io"
-	"io/ioutil"
-	"net/http"
 )
-
-//Response fetch response struct
-type Response struct {
-	*http.Response
-	bytes *[]byte
-}
-
-//BodyContent read and return body content from response.
-//Response body will be closed after first read.
-func (r *Response) BodyContent() ([]byte, error) {
-	if r.bytes != nil {
-		return *r.bytes, nil
-	}
-	defer r.Response.Body.Close()
-	bs, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		return nil, err
-	}
-	r.bytes = &bs
-	return *r.bytes, nil
-}
-
-//Error return response body content as error.
-func (r *Response) Error() string {
-	bs, err := r.BodyContent()
-	if err != nil {
-		return err.Error()
-	}
-	return string(bs)
-}
-
-//NewResponse create new response
-func NewResponse() *Response {
-	return &Response{}
-}
-
-//ConvertResponse convert http response to fetch response
-func ConvertResponse(resp *http.Response) *Response {
-	r := NewResponse()
-	r.Response = resp
-	return r
-}
 
 //Parser response parser interface
 type Parser interface {
@@ -65,12 +21,29 @@ func (p ParserFunc) Parse(resp *Response) error {
 	return p(resp)
 }
 
+//ShouldOK parser that check if status code == 200.
+//Give parser will parse responese if success or respnse will be returned as error.
+func ShouldOK(p Parser) Parser {
+	return ParserFunc(func(resp *Response) error {
+		if resp.StatusCode != 200 {
+			return resp
+		}
+		if p == nil {
+			return nil
+		}
+		return p.Parse(resp)
+	})
+}
+
 //ShouldSuccess parser that check if status code < 300.
 //Give parser will parse responese if success or respnse will be returned as error.
 func ShouldSuccess(p Parser) Parser {
 	return ParserFunc(func(resp *Response) error {
 		if resp.StatusCode >= 300 {
 			return resp
+		}
+		if p == nil {
+			return nil
 		}
 		return p.Parse(resp)
 	})
@@ -82,6 +55,9 @@ func ShouldNoError(p Parser) Parser {
 	return ParserFunc(func(resp *Response) error {
 		if resp.StatusCode >= 500 {
 			return resp
+		}
+		if p == nil {
+			return nil
 		}
 		return p.Parse(resp)
 	})
@@ -128,10 +104,10 @@ func AsJSON(v interface{}) Parser {
 	})
 }
 
-//FetchAndParse fetch response and prase response with given commands and parser if no error raised.
+//FetchAndParse fetch request and prase response with given preset and parser if no error raised.
 //Return response fetched and any error raised when fetching or parsing.
-func FetchAndParse(commands Commands, parser Parser) (*Response, error) {
-	resp, err := Fetch(commands.Commands()...)
+func FetchAndParse(preset *Preset, parser Parser) (*Response, error) {
+	resp, err := Fetch(preset.Commands()...)
 	if err != nil {
 		return nil, err
 	}
@@ -142,9 +118,32 @@ func FetchAndParse(commands Commands, parser Parser) (*Response, error) {
 	return resp, nil
 }
 
-//FetchWithBodyAndParse fetch response and prase response with given commands ,body and parser if no error raised.
+//DoAndParse do request and prase response with given doer,preset and parser if no error raised.
 //Return response fetched and any error raised when fetching or parsing.
-func FetchWithBodyAndParse(commands Commands, body io.Reader, parser Parser) (*Response, error) {
-	preset := BuildPreset(commands.Commands()...)
+func DoAndParse(doer Doer, preset *Preset, parser Parser) (*Response, error) {
+	return FetchAndParse(preset.With(SetDoer(doer)), parser)
+}
+
+//FetchWithBodyAndParse fetch request and prase response with given preset ,body and parser if no error raised.
+//Return response fetched and any error raised when fetching or parsing.
+func FetchWithBodyAndParse(preset *Preset, body io.Reader, parser Parser) (*Response, error) {
 	return FetchAndParse(preset.With(Body(body)), parser)
+}
+
+//FetchWithJSONBodyAndParse fetch request and prase response with given preset , body as json and parser if no error raised.
+//Return response fetched and any error raised when fetching or parsing.
+func FetchWithJSONBodyAndParse(preset *Preset, body interface{}, parser Parser) (*Response, error) {
+	return FetchAndParse(preset.With(JSONBody(body)), parser)
+}
+
+//DoWithBodyAndParse do request and prase response with given doer,preset,body and parser if no error raised.
+//Return response fetched and any error raised when fetching or parsing.
+func DoWithBodyAndParse(doer Doer, preset *Preset, body io.Reader, parser Parser) (*Response, error) {
+	return FetchAndParse(preset.With(SetDoer(doer), Body(body)), parser)
+}
+
+//DoWithJSONBodyAndParse do request and prase response with given doer,preset,body as json and parser if no error raised.
+//Return response fetched and any error raised when fetching or parsing.
+func DoWithJSONBodyAndParse(doer Doer, preset *Preset, body interface{}, parser Parser) (*Response, error) {
+	return FetchAndParse(preset.With(SetDoer(doer), JSONBody(body)), parser)
 }

@@ -1,6 +1,8 @@
 package fetcher
 
 import (
+	"bytes"
+	"encoding/json"
 	"io"
 	"net/http"
 	"net/url"
@@ -62,6 +64,23 @@ func Body(body io.Reader) Command {
 	})
 }
 
+//JSONBody command which modify fetcher body to given value as json.
+//Fetcher body will set to nil if v is nil.
+func JSONBody(v interface{}) Command {
+	return CommandFunc(func(f *Fetcher) error {
+		if v == nil {
+			f.Body = nil
+			return nil
+		}
+		bs, err := json.Marshal(v)
+		if err != nil {
+			return err
+		}
+		f.Body = bytes.NewBuffer(bs)
+		return nil
+	})
+}
+
 //Header command which merge fetcher header by given reader.
 func Header(h http.Header) Command {
 	return CommandFunc(func(f *Fetcher) error {
@@ -74,6 +93,14 @@ func Header(h http.Header) Command {
 func SetDoer(d Doer) Command {
 	return CommandFunc(func(f *Fetcher) error {
 		f.Doer = d
+		return nil
+	})
+}
+
+//SetQuery command which modify fetcher doer to set given query.
+func SetQuery(name string, value string) Command {
+	return CommandFunc(func(f *Fetcher) error {
+		f.URL.Query().Set(name, value)
 		return nil
 	})
 }

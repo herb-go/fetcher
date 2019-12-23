@@ -3,6 +3,7 @@ package fetcher
 import (
 	"net/http"
 	"net/url"
+	"sync"
 	"time"
 )
 
@@ -22,6 +23,7 @@ var DefaultIdleConnTimeout = 120 * time.Second
 var DefaultTLSHandshakeTimeout = 30 * time.Second
 
 //Client http client config struct
+//Value should not changed after first "DO" call.
 type Client struct {
 	//TimeoutInSecond timeout in secound
 	//Default value is 120.
@@ -38,7 +40,9 @@ type Client struct {
 	//Proxy proxy url.
 	//If set to empty string,clients will not use proxy.
 	//Default value is empty string.
-	Proxy string
+	Proxy  string
+	locker sync.Mutex
+	doer   Doer
 }
 
 //CreateDoer create doer.
@@ -46,6 +50,36 @@ type Client struct {
 func (c *Client) CreateDoer() (Doer, error) {
 	client := http.Client{}
 	return &client, nil
+}
+
+func (c *Client) getDoer() (Doer, error) {
+	c.locker.Lock()
+	defer c.locker.Unlock()
+	if c.doer != nil {
+		return c.doer, nil
+	}
+	d, err := c.CreateDoer()
+	if err != nil {
+		return nil, err
+	}
+	return d, nil
+}
+
+//Do create request ,client with given f.etcher and commands and fetch
+//Return http response and any error if raised.
+func (c *Client) Do(req *http.Request) (*http.Response, error) {
+	d, err := c.getDoer()
+	if err != nil {
+		return nil, err
+	}
+	return d.Do(req)
+}
+
+//SelfCheck self check.
+//Return any error if raised.
+func (c *Client) SelfCheck() error {
+	_, err := c.getDoer()
+	return err
 }
 
 //URLToProxy Convert url to fixed proxy.
