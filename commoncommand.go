@@ -4,6 +4,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"strings"
 )
 
 //URL create new command which modify fetcher url to given url
@@ -32,6 +33,14 @@ type PathPrefix string
 func (p PathPrefix) Exec(f *Fetcher) error {
 	f.URL.Path = f.URL.Path + string(p)
 	return nil
+}
+
+//Replace command which modify fetcher path by given placeholder and value.
+func Replace(placeholder string, value string) Command {
+	return CommandFunc(func(f *Fetcher) error {
+		f.URL.Path = strings.NewReplacer(placeholder, value).Replace(f.URL.Path)
+		return nil
+	})
 }
 
 var (

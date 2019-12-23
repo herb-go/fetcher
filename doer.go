@@ -115,5 +115,5 @@ func Do(f *Fetcher, b ...Command) (*Response, error) {
 	if err != nil {
 		return nil, err
 	}
-	return NewResponse(resp), nil
+	return ConvertResponse(resp), nil
 }

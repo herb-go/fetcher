@@ -28,3 +28,7 @@ func Exec(f *Fetcher, b ...Command) error {
 	}
 	return nil
 }
+
+type Commands interface {
+	Commands() []Command
+}

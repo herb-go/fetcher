@@ -1,14 +1,15 @@
 package fetcher
 
 import (
+	"io"
 	"net/http"
 	"net/url"
 )
 
-//Preset fetch preset
+//Preset fetch preset.
 type Preset []Command
 
-//Clone clone  preset
+//Clone clone preset.
 func (p *Preset) Clone() *Preset {
 	cmds := make([]Command, len(*p))
 	copy(cmds, *p)
@@ -16,13 +17,22 @@ func (p *Preset) Clone() *Preset {
 	return ep
 }
 
-//With clone preset with commands
+//With clone preset with commands.
 func (p *Preset) With(cmds ...Command) *Preset {
 	preset := BuildPreset(append(*p, cmds...)...)
 	return preset
 }
 
-//Commands return preset commands
+//Append clone and append preset with given presets in order.
+func (p *Preset) Append(presets ...*Preset) *Preset {
+	var cmds = p.Commands()
+	for k := range presets {
+		cmds = append(cmds, presets[k].Commands()...)
+	}
+	return BuildPreset(cmds...)
+}
+
+//Commands return preset commands.
 func (p *Preset) Commands() []Command {
 	return []Command(*p)
 }
@@ -32,11 +42,29 @@ func (p *Preset) EndPoint(pathprefix string, method string) *Preset {
 	return p.With(PathPrefix(pathprefix), Method(method))
 }
 
-//Fetch fetch http response.
+//Fetch fetch  response.
 //Preset and commands will exec on new fetcher by which fetching response.
-//Return http response and any error if raised
+//Return http response and any error if raised.
 func (p *Preset) Fetch(cmds ...Command) (*Response, error) {
 	return Fetch(p.With(cmds...).Commands()...)
+}
+
+//FetchWithBody fetch response with given body.
+//Return http response and any error if raised.
+func (p *Preset) FetchWithBody(body io.Reader) (*Response, error) {
+	return p.Fetch(Body(body))
+}
+
+//FetchAndParse fetch response and prase response with given parser if no error raised.
+//Return response fetched and any error raised when fetching or parsing.
+func (p *Preset) FetchAndParse(preset Parser) (*Response, error) {
+	return FetchAndParse(p, preset)
+}
+
+//FetchWithBodyAndParse fetch response and prase response with given preset ,body and parser if no error raised.
+//Return response fetched and any error raised when fetching or parsing.
+func (p *Preset) FetchWithBodyAndParse(body io.Reader, preset Parser) (*Response, error) {
+	return FetchWithBodyAndParse(p, body, preset)
 }
 
 //NewPreset create new preset
@@ -50,11 +78,30 @@ func BuildPreset(cmds ...Command) *Preset {
 	return &p
 }
 
+//ServerInfo server info struct
+type ServerInfo struct {
+	//Host server host url
+	Host string
+	//Header http header
+	Header http.Header
+	//Method http method
+	Method string
+}
+
+//CreatePreset create new preset.
+//Return preset created and any error raised.
+func (s *ServerInfo) CreatePreset() (*Preset, error) {
+	u, err := url.Parse(s.Host)
+	if err != nil {
+		return nil, err
+	}
+	p := BuildPreset(URL(u), Method(s.Method), Header(s.Header))
+	return p, nil
+}
+
 //Server http server config struct
 type Server struct {
-	Host   string
-	Header http.Header
-	Method string
+	ServerInfo
 	Client Client
 }
 
@@ -62,16 +109,16 @@ type Server struct {
 //Return preset created and any error raised.
 func (s *Server) CreatePreset() (*Preset, error) {
 	var err error
-	u, err := url.Parse(s.Host)
-	if err != nil {
-		return nil, err
-	}
+
 	doer, err := s.Client.CreateDoer()
 	if err != nil {
 		return nil, err
 	}
-	p := BuildPreset(URL(u), SetDoer(doer), Method(s.Method), Header(s.Header))
-	return p, nil
+	p, err := s.ServerInfo.CreatePreset()
+	if err != nil {
+		return nil, err
+	}
+	return p.With(SetDoer(doer)), nil
 }
 
 //PresetFactory preset factory.

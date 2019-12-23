@@ -30,7 +30,7 @@ func (f *Fetcher) AppendBuilder(b ...func(*http.Request) error) {
 	f.Builders = append(CloneRequestBuilders(f.Builders), b...)
 }
 
-//Raw create raw http request ,doer ,and any error if raised.
+//Raw create raw http request,doer and any error if raised.
 func (f *Fetcher) Raw() (*http.Request, Doer, error) {
 	url := f.URL.String()
 	req, err := http.NewRequest(f.Method, url, f.Body)
