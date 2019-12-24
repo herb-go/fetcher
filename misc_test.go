@@ -44,4 +44,20 @@ func TestMisc(t *testing.T) {
 	if header3.Get("abc") != "123" || header3.Get("cde") != "456" {
 		t.Fatal(header3)
 	}
+	builders := []func(*http.Request) error{
+		nil,
+		func(*http.Request) error {
+			return nil
+		},
+	}
+	builders2 := CloneRequestBuilders(builders)
+	if len(builders2) != 2 || builders2[0] != nil {
+		t.Fatal(builders2)
+	}
+	builders[0] = func(*http.Request) error {
+		return nil
+	}
+	if builders2[0] != nil {
+		t.Fatal(builders2)
+	}
 }

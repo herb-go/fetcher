@@ -4,9 +4,6 @@ import (
 	"testing"
 )
 
-func TestMustPreset(t *testing.T) {
-
-}
 func TestPreset(t *testing.T) {
 	s := newEchoServer()
 	defer s.Close()
@@ -15,10 +12,7 @@ func TestPreset(t *testing.T) {
 			URL: s.URL,
 		},
 	}
-	preset, err := sc.CreatePreset()
-	if err != nil {
-		t.Fatal(err)
-	}
+	preset := MustPreset(sc)
 	resp, err := preset.Fetch()
 	if err != nil {
 		t.Fatal(err)

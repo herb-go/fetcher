@@ -155,11 +155,7 @@ func Do(f *Fetcher, b ...Command) (*Response, error) {
 	if err != nil {
 		return nil, err
 	}
-	req, d, err := f.Raw()
-	if err != nil {
-		return nil, err
-	}
-	resp, err := d.Do(req)
+	resp, err := f.Fetch()
 	if err != nil {
 		return nil, err
 	}

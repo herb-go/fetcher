@@ -160,3 +160,16 @@ func TestGzip(t *testing.T) {
 	}
 
 }
+
+func TestNilClient(t *testing.T) {
+	s := newEchoServer()
+	defer s.Close()
+	p := MustPreset(&ServerInfo{
+		URL: s.URL,
+	})
+	resp, err := p.Fetch()
+	if err != nil {
+		t.Fatal(err)
+	}
+	resp.Body.Close()
+}
