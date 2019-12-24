@@ -8,10 +8,12 @@ import (
 )
 
 //DefaultDoer default doer used to do http request if not setted.
-var DefaultDoer = http.DefaultClient
+var DefaultDoer = func() Doer {
+	return http.DefaultClient
+}
 
 //DefaultTimeout default client timeout
-var DefaultTimeout = 120
+var DefaultTimeout = 120 * time.Second
 
 //DefaultMaxIdleConns default client max idle conns
 var DefaultMaxIdleConns = 20
@@ -27,16 +29,16 @@ var DefaultTLSHandshakeTimeout = 30 * time.Second
 type Client struct {
 	//TimeoutInSecond timeout in secound
 	//Default value is 120.
-	TimeoutInSecond int
+	TimeoutInSecond int64
 	//MaxIdleConns max idel conns.
 	//Default value is 20
 	MaxIdleConns int
 	//IdleConnTimeoutInSecond idel conn timeout in second.
 	//Default value is 120
-	IdleConnTimeoutInSecond int
+	IdleConnTimeoutInSecond int64
 	//TLSHandshakeTimeoutInSecond tls handshake timeout in secound.
 	//default value is 30.
-	TLSHandshakeTimeoutInSecond int
+	TLSHandshakeTimeoutInSecond int64
 	//Proxy proxy url.
 	//If set to empty string,clients will not use proxy.
 	//Default value is empty string.
@@ -48,7 +50,19 @@ type Client struct {
 //CreateDoer create doer.
 //Return doer createrd and any error if raised.
 func (c *Client) CreateDoer() (Doer, error) {
-	client := http.Client{}
+	var timeout time.Duration
+	if c.TimeoutInSecond > 0 {
+		timeout = time.Duration(c.TimeoutInSecond) * time.Second
+	} else {
+		timeout = DefaultTimeout
+	}
+	transport := c.getTransport()
+	transport.Proxy = URLToProxy(c.Proxy)
+	client := http.Client{
+		Timeout:   timeout,
+		Transport: transport,
+	}
+
 	return &client, nil
 }
 
@@ -101,13 +115,13 @@ func (c *Client) getTransport() *http.Transport {
 		maxIdleCoons = DefaultMaxIdleConns
 	}
 	var idleConnTimeout time.Duration
-	if idleConnTimeout == 0 {
+	if c.IdleConnTimeoutInSecond <= 0 {
 		idleConnTimeout = DefaultIdleConnTimeout
 	} else {
 		idleConnTimeout = time.Duration(c.IdleConnTimeoutInSecond) * time.Second
 	}
 	var tlsHandshakeTimeout time.Duration
-	if tlsHandshakeTimeout == 0 {
+	if c.TLSHandshakeTimeoutInSecond <= 0 {
 		tlsHandshakeTimeout = DefaultTLSHandshakeTimeout
 	} else {
 		tlsHandshakeTimeout = time.Duration(c.TLSHandshakeTimeoutInSecond) * time.Second

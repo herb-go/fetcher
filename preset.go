@@ -80,8 +80,8 @@ func BuildPreset(cmds ...Command) *Preset {
 
 //ServerInfo server info struct
 type ServerInfo struct {
-	//Host server host url
-	Host string
+	//URL server host url
+	URL string
 	//Header http header
 	Header http.Header
 	//Method http method
@@ -91,7 +91,7 @@ type ServerInfo struct {
 //CreatePreset create new preset.
 //Return preset created and any error raised.
 func (s *ServerInfo) CreatePreset() (*Preset, error) {
-	u, err := url.Parse(s.Host)
+	u, err := url.Parse(s.URL)
 	if err != nil {
 		return nil, err
 	}

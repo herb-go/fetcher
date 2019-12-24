@@ -39,7 +39,7 @@ func (f *Fetcher) Raw() (*http.Request, Doer, error) {
 	}
 	MergeHeader(req.Header, f.Header)
 	if f.Doer == nil {
-		return req, DefaultDoer, nil
+		return req, DefaultDoer(), nil
 	}
 	return req, f.Doer, nil
 }
@@ -52,16 +52,6 @@ func (f *Fetcher) Fetch() (*http.Response, error) {
 		return nil, err
 	}
 	return doer.Do(req)
-}
-
-//Clone clone fetcher
-func (f *Fetcher) Clone() *Fetcher {
-	return &Fetcher{
-		URL:      CloneURL(f.URL),
-		Header:   CloneHeader(f.Header),
-		Method:   f.Method,
-		Builders: CloneRequestBuilders(f.Builders),
-	}
 }
 
 //New create new fetcher
