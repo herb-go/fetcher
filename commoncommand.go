@@ -37,6 +37,16 @@ func (p PathPrefix) Exec(f *Fetcher) error {
 	return nil
 }
 
+//Host command which modify fetcher url with given host
+type Host string
+
+//Exec exec command to modify fetcher.
+//Return any error if raised.
+func (h Host) Exec(f *Fetcher) error {
+	f.URL.Host = string(h)
+	return nil
+}
+
 //Replace command which modify fetcher path by given placeholder and value.
 func Replace(placeholder string, value string) Command {
 	return CommandFunc(func(f *Fetcher) error {
@@ -100,7 +110,9 @@ func SetDoer(d Doer) Command {
 //SetQuery command which modify fetcher doer to set given query.
 func SetQuery(name string, value string) Command {
 	return CommandFunc(func(f *Fetcher) error {
-		f.URL.Query().Set(name, value)
+		q := f.URL.Query()
+		q.Set(name, value)
+		f.URL.RawQuery = q.Encode()
 		return nil
 	})
 }

@@ -84,6 +84,11 @@ func TestProxy(t *testing.T) {
 	client := Client{
 		Proxy: proxy.URL,
 	}
+	err := client.SelfCheck()
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	req, err := http.NewRequest("GET", server.URL, nil)
 	if err != nil {
 		t.Fatal(err)

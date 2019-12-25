@@ -57,6 +57,8 @@ func (f *Fetcher) Fetch() (*http.Response, error) {
 //New create new fetcher
 func New() *Fetcher {
 	return &Fetcher{
+		URL:      &url.URL{},
+		Header:   http.Header{},
 		Builders: []func(*http.Request) error{},
 	}
 }

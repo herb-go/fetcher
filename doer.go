@@ -76,6 +76,7 @@ func (c *Client) getDoer() (Doer, error) {
 	if err != nil {
 		return nil, err
 	}
+	c.doer = d
 	return d, nil
 }
 

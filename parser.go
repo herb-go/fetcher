@@ -21,9 +21,9 @@ func (p ParserFunc) Parse(resp *Response) error {
 	return p(resp)
 }
 
-//ShouldOK parser that check if status code == 200.
+//Should200 parser that check if status code == 200.
 //Give parser will parse responese if success or respnse will be returned as error.
-func ShouldOK(p Parser) Parser {
+func Should200(p Parser) Parser {
 	return ParserFunc(func(resp *Response) error {
 		if resp.StatusCode != 200 {
 			return resp

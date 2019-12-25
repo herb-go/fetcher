@@ -9,12 +9,10 @@ import (
 //Preset fetch preset.
 type Preset []Command
 
-//Clone clone preset.
-func (p *Preset) Clone() *Preset {
-	cmds := make([]Command, len(*p))
-	copy(cmds, *p)
-	ep := BuildPreset(cmds...)
-	return ep
+//Exec exec command to modify fetcher.
+//Return any error if raised.
+func (p *Preset) Exec(f *Fetcher) error {
+	return Exec(f, p.Commands()...)
 }
 
 //With clone preset with commands.
@@ -128,6 +126,9 @@ type PresetFactory interface {
 	CreatePreset() (*Preset, error)
 }
 
+//MustPreset create preset by given preset factory.
+//Return preset created.
+//Panic if any error raised.
 func MustPreset(f PresetFactory) *Preset {
 	p, err := f.CreatePreset()
 	if err != nil {

@@ -29,7 +29,7 @@ func CloneHeader(h http.Header) http.Header {
 func MergeHeader(dst http.Header, src http.Header) {
 	for name := range src {
 		for k := range src[name] {
-			dst.Add(name, src[name][k])
+			dst.Set(name, src[name][k])
 		}
 	}
 }
