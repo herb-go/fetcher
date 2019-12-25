@@ -107,12 +107,23 @@ func SetDoer(d Doer) Command {
 	})
 }
 
-//SetQuery command which modify fetcher doer to set given query.
+//SetQuery command which modify fetcher to set given query.
 func SetQuery(name string, value string) Command {
 	return CommandFunc(func(f *Fetcher) error {
 		q := f.URL.Query()
 		q.Set(name, value)
 		f.URL.RawQuery = q.Encode()
+		return nil
+	})
+}
+
+//BasicAuth command which modify fetcher  to set given basic auth info.
+func BasicAuth(username string, password string) Command {
+	return CommandFunc(func(f *Fetcher) error {
+		f.AppendBuilder(func(r *http.Request) error {
+			r.SetBasicAuth(username, password)
+			return nil
+		})
 		return nil
 	})
 }

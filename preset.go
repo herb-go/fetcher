@@ -65,6 +65,12 @@ func (p *Preset) FetchWithBodyAndParse(body io.Reader, preset Parser) (*Response
 	return FetchWithBodyAndParse(p, body, preset)
 }
 
+//FetchWithJSONBodyAndParse fetch request and prase response with given preset ,body as json and parser if no error raised.
+//Return response fetched and any error raised when fetching or parsing.
+func (p *Preset) FetchWithJSONBodyAndParse(body interface{}, preset Parser) (*Response, error) {
+	return FetchAndParse(p.With(JSONBody(body)), preset)
+}
+
 //NewPreset create new preset
 func NewPreset() *Preset {
 	return &Preset{}

@@ -128,7 +128,24 @@ func TestCommonCommand(t *testing.T) {
 	if f.Method != "MethodBuilderProvider" {
 		t.Fatal(f)
 	}
-
+	f = New()
+	r, _, err := f.Raw()
+	if err != nil {
+		t.Fatal(err)
+	}
+	u, p, ok := r.BasicAuth()
+	if ok || u != "" || p != "" {
+		t.Fatal(u, p)
+	}
+	err = BasicAuth("user", "pw").Exec(f)
+	r, _, err = f.Raw()
+	if err != nil {
+		t.Fatal(err)
+	}
+	u, p, ok = r.BasicAuth()
+	if !ok || u != "user" || p != "pw" {
+		t.Fatal(u, p)
+	}
 }
 
 func TestCommonCommantecho(t *testing.T) {

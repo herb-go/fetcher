@@ -1,6 +1,7 @@
 package fetcher
 
 import (
+	"bytes"
 	"testing"
 )
 
@@ -20,6 +21,29 @@ func TestPreset(t *testing.T) {
 	resp.Body.Close()
 	if resp.StatusCode != 200 {
 		t.Fatal(resp)
+	}
+	resp, err = preset.FetchAndParse(Should200(nil))
+	if err != nil {
+		t.Fatal(err)
+	}
+	resp.Body.Close()
+	var result string
+	resp, err = preset.FetchWithBodyAndParse(bytes.NewBufferString("12345"), Should200(AsString(&result)))
+	if err != nil {
+		t.Fatal(err)
+	}
+	resp.Body.Close()
+	if result != "12345" {
+		t.Fatal(result)
+	}
+	result = ""
+	resp, err = preset.FetchWithJSONBodyAndParse("12345", Should200(AsJSON(&result)))
+	if err != nil {
+		t.Fatal(err)
+	}
+	resp.Body.Close()
+	if result != "12345" {
+		t.Fatal(result)
 	}
 }
 

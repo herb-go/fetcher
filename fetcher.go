@@ -38,6 +38,13 @@ func (f *Fetcher) Raw() (*http.Request, Doer, error) {
 		return nil, nil, err
 	}
 	MergeHeader(req.Header, f.Header)
+	for k := range f.Builders {
+		err = f.Builders[k](req)
+		if err != nil {
+			return nil, nil, err
+		}
+	}
+
 	if f.Doer == nil {
 		return req, DefaultDoer(), nil
 	}
