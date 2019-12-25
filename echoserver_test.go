@@ -20,7 +20,7 @@ func EchoAction(w http.ResponseWriter, r *http.Request) {
 	statuscode := r.URL.Query().Get("statuscode")
 	w.Header().Set("rawpath", r.URL.RawPath)
 	code, err := strconv.Atoi(statuscode)
-	if err != nil && code != 0 {
+	if err == nil && code != 0 {
 		w.WriteHeader(code)
 	}
 	w.Write(data)

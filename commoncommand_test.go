@@ -1,6 +1,9 @@
 package fetcher
 
 import (
+	"bytes"
+	"encoding/json"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"testing"
@@ -123,6 +126,70 @@ func TestCommonCommand(t *testing.T) {
 	}
 	err = MethodBuilder(&mbp{}).Exec(f)
 	if f.Method != "MethodBuilderProvider" {
+		t.Fatal(f)
+	}
+
+}
+
+func TestCommonCommantecho(t *testing.T) {
+	var err error
+	s := newEchoServer()
+	defer s.Close()
+	var sc = &Server{
+		ServerInfo: ServerInfo{
+			URL: s.URL,
+		},
+	}
+	preset := MustPreset(sc)
+	f := New()
+	err = preset.Exec(f)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = JSONBody("12345").Exec(f)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var data string
+	resp, err := f.Fetch()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer resp.Body.Close()
+	bs, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = json.Unmarshal(bs, &data)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if data != "12345" {
+		t.Fatal(data)
+	}
+	f = New()
+	err = preset.Exec(f)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = JSONBody(nil).Exec(f)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if f.Body != nil {
+		t.Fatal(f)
+	}
+	f = New()
+	body := bytes.NewBufferString("buf")
+	err = preset.Exec(f)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = Body(body).Exec(f)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if f.Body != body {
 		t.Fatal(f)
 	}
 

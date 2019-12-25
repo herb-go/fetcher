@@ -64,14 +64,14 @@ func ShouldNoError(p Parser) Parser {
 }
 
 //AsBytes create parser which parse givn byte slice from response.
-func AsBytes(bytes []byte) Parser {
+func AsBytes(bytes *[]byte) Parser {
 	return ParserFunc(func(resp *Response) error {
 		bs, err := resp.BodyContent()
 		if err != nil {
 			return err
 		}
-		bytes = make([]byte, len(bs))
-		copy(bytes, bs)
+		*bytes = make([]byte, len(bs))
+		copy(*bytes, bs)
 		return nil
 	})
 }
