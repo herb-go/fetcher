@@ -27,6 +27,17 @@ func (m Method) Exec(f *Fetcher) error {
 	return nil
 }
 
+var (
+	//Post http POST method Command.
+	Post = Method("POST")
+	//Get http GET method Command.
+	Get = Method("GET")
+	//Put http PUT method Command.
+	Put = Method("PUT")
+	//Delete http DELETE method Command.
+	Delete = Method("DELETE")
+)
+
 //PathPrefix command which modify fetcher url with given path prefix
 type PathPrefix string
 
@@ -54,17 +65,6 @@ func Replace(placeholder string, value string) Command {
 		return nil
 	})
 }
-
-var (
-	//Post http POST method Command.
-	Post = Method("POST")
-	//Get http GET method Command.
-	Get = Method("GET")
-	//Put http PUT method Command.
-	Put = Method("PUT")
-	//Delete http DELETE method Command.
-	Delete = Method("DELETE")
-)
 
 //Body command which modify fetcher body to given reader.
 func Body(body io.Reader) Command {
