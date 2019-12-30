@@ -67,7 +67,7 @@ func TestPresetMethods(t *testing.T) {
 	if len(cmds) != 4 || cmds[0] == nil || cmds[1] == nil || cmds[2] != nil || cmds[3] != nil {
 		t.Fatal(pnil)
 	}
-	p = NewPreset().EndPoint("/pathprefix", "TESTMETHOD")
+	p = NewPreset().EndPoint("TESTMETHOD", "/pathprefix")
 	f := New()
 	f.URL.Path = "raw"
 	err = p.Exec(f)
@@ -76,5 +76,26 @@ func TestPresetMethods(t *testing.T) {
 	}
 	if f.URL.Path != "raw/pathprefix" || f.Method != "TESTMETHOD" {
 		t.Fatal(f)
+	}
+}
+
+func TestClonePreset(t *testing.T) {
+	cmds := []Command{
+		CommandFunc(func(*Fetcher) error { return nil }),
+	}
+	p := NewPreset().With(cmds...)
+	p2 := BuildPreset(cmds...)
+	if p.Commands()[0] == nil {
+		t.Fatal(p)
+	}
+	if p2.Commands()[0] == nil {
+		t.Fatal(p)
+	}
+	cmds[0] = nil
+	if p.Commands()[0] == nil {
+		t.Fatal(p)
+	}
+	if p2.Commands()[0] == nil {
+		t.Fatal(p)
 	}
 }

@@ -36,7 +36,7 @@ func (p *Preset) Commands() []Command {
 }
 
 //EndPoint create new preset with given pathprefix and method.
-func (p *Preset) EndPoint(pathprefix string, method string) *Preset {
+func (p *Preset) EndPoint(method string, pathprefix string) *Preset {
 	return p.With(PathPrefix(pathprefix), Method(method))
 }
 
@@ -78,7 +78,9 @@ func NewPreset() *Preset {
 
 //BuildPreset build new preset with given commands
 func BuildPreset(cmds ...Command) *Preset {
-	p := Preset(cmds)
+	pcmds := make([]Command, len(cmds))
+	copy(pcmds, cmds)
+	p := Preset(pcmds)
 	return &p
 }
 
