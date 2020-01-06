@@ -129,6 +129,18 @@ func SetQuery(name string, value string) Command {
 	})
 }
 
+//Params command which modify fetcher to set given params.
+func Params(params url.Values) Command {
+	return CommandFunc(func(f *Fetcher) error {
+		q := f.URL.Query()
+		for key := range params {
+			q.Set(key, params.Get(key))
+		}
+		f.URL.RawQuery = q.Encode()
+		return nil
+	})
+}
+
 //BasicAuth command which modify fetcher  to set given basic auth info.
 func BasicAuth(username string, password string) Command {
 	return CommandFunc(func(f *Fetcher) error {

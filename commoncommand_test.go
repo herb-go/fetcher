@@ -111,6 +111,26 @@ func TestCommonCommand(t *testing.T) {
 	if f.URL.Query().Get("k1") != "v1" {
 		t.Fatal(f)
 	}
+	params := url.Values{}
+	params.Set("k1", "v1")
+	params.Set("k2", "v2")
+	f = New()
+	if f.URL.Query().Get("k1") != "" {
+		t.Fatal(f)
+	}
+	if f.URL.Query().Get("k2") != "" {
+		t.Fatal(f)
+	}
+	err = Params(params).Exec(f)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if f.URL.Query().Get("k1") != "v1" {
+		t.Fatal(f)
+	}
+	if f.URL.Query().Get("k2") != "v2" {
+		t.Fatal(f)
+	}
 	f = New()
 	if len(f.Builders) != 0 {
 		t.Fatal(f)
