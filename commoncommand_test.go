@@ -90,6 +90,17 @@ func TestCommonCommand(t *testing.T) {
 		t.Fatal(f)
 	}
 	f = New()
+	if f.Header.Get("k1") != "" {
+		t.Fatal(f)
+	}
+	err = SetHeader("k1", "v1").Exec(f)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if f.Header.Get("k1") != "v1" {
+		t.Fatal(f)
+	}
+	f = New()
 	if f.URL.Query().Get("k1") != "" {
 		t.Fatal(f)
 	}

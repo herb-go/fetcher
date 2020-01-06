@@ -103,6 +103,14 @@ func Header(h http.Header) Command {
 	})
 }
 
+//SetHeader command which set fetcher header by given key and value.
+func SetHeader(key string, value string) Command {
+	return CommandFunc(func(f *Fetcher) error {
+		f.Header.Set(key, value)
+		return nil
+	})
+}
+
 //SetDoer command which modify fetcher doer to given doer.
 func SetDoer(d Doer) Command {
 	return CommandFunc(func(f *Fetcher) error {
