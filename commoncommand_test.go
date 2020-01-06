@@ -30,29 +30,39 @@ type mbp struct {
 func (mbp *mbp) RequestMethod() (string, error) {
 	return "MethodBuilderProvider", nil
 }
+
+type pp struct {
+}
+
+func (pp *pp) BuildParams(params url.Values) error {
+	params.Add("id", "test")
+	return nil
+}
 func TestCommonCommand(t *testing.T) {
 	var err error
 	f := New()
-	url, err := url.Parse("http://127.0.0.1/{{path}}/")
-	err = URL(url).Exec(f)
+	u := "http://127.0.0.1/{{path}}/"
+	err = URL(u).Exec(f)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if f.URL != url || f.URL.Path != "/{{path}}/" || f.URL.Host != "127.0.0.1" {
+
+	if f.URL.Path != "/{{path}}/" || f.URL.Host != "127.0.0.1" {
 		t.Fatal(f)
 	}
+
 	err = Replace("{{path}}", "replacement").Exec(f)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if f.URL != url || f.URL.Path != "/replacement/" {
+	if f.URL.Path != "/replacement/" {
 		t.Fatal(f)
 	}
 	err = Host("localhost").Exec(f)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if f.URL != url || f.URL.Host != "localhost" {
+	if f.URL.Host != "localhost" {
 		t.Fatal(f)
 	}
 
@@ -129,12 +139,21 @@ func TestCommonCommand(t *testing.T) {
 		t.Fatal(f)
 	}
 	f = New()
+	if f.URL.Query().Get("id") != "" {
+		t.Fatal(f)
+	}
+	err = ParamsBuilder(&pp{}).Exec(f)
+	if f.URL.Query().Get("id") != "test" {
+		t.Fatal(f)
+	}
+
+	f = New()
 	r, _, err := f.Raw()
 	if err != nil {
 		t.Fatal(err)
 	}
-	u, p, ok := r.BasicAuth()
-	if ok || u != "" || p != "" {
+	user, p, ok := r.BasicAuth()
+	if ok || user != "" || p != "" {
 		t.Fatal(u, p)
 	}
 	err = BasicAuth("user", "pw").Exec(f)
@@ -142,8 +161,8 @@ func TestCommonCommand(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	u, p, ok = r.BasicAuth()
-	if !ok || u != "user" || p != "pw" {
+	user, p, ok = r.BasicAuth()
+	if !ok || user != "user" || p != "pw" {
 		t.Fatal(u, p)
 	}
 }

@@ -10,9 +10,13 @@ import (
 )
 
 //URL create new command which modify fetcher url to given url
-func URL(u *url.URL) Command {
+func URL(u string) Command {
 	return CommandFunc(func(f *Fetcher) error {
-		f.URL = u
+		furl, err := url.Parse(u)
+		if err != nil {
+			return err
+		}
+		f.URL = furl
 		return nil
 	})
 }
@@ -128,6 +132,17 @@ func BasicAuth(username string, password string) Command {
 	})
 }
 
+//RequestBuilderFunc request builder func type
+type RequestBuilderFunc func(*http.Request) error
+
+//Exec exec command to modify fetcher.
+//Return any error if raised.
+func (b RequestBuilderFunc) Exec(f *Fetcher) error {
+	f.AppendBuilder(b)
+	return nil
+
+}
+
 //RequestBuilderProvider request builder provider interface.
 type RequestBuilderProvider interface {
 	BuildRequest(*http.Request) error
@@ -135,10 +150,16 @@ type RequestBuilderProvider interface {
 
 //RequestBuilder command which append given request builder to fetcher.
 func RequestBuilder(p RequestBuilderProvider) Command {
-	return CommandFunc(func(f *Fetcher) error {
-		f.AppendBuilder(p.BuildRequest)
-		return nil
-	})
+	return RequestBuilderFunc(p.BuildRequest)
+}
+
+//HeaderBuilderFunc header builde func
+type HeaderBuilderFunc func(http.Header) error
+
+//Exec exec command to modify fetcher.
+//Return any error if raised.
+func (b HeaderBuilderFunc) Exec(f *Fetcher) error {
+	return b(f.Header)
 }
 
 //HeaderBuilderProvier header builde provider
@@ -148,9 +169,22 @@ type HeaderBuilderProvier interface {
 
 //HeaderBuilder command which modify fetcher header by given header builder provider.
 func HeaderBuilder(p HeaderBuilderProvier) Command {
-	return CommandFunc(func(f *Fetcher) error {
-		return p.BuildHeader(f.Header)
-	})
+	return HeaderBuilderFunc(p.BuildHeader)
+}
+
+//MethodBuilderFunc method builder func
+type MethodBuilderFunc func() (string, error)
+
+//Exec exec command to modify fetcher.
+//Return any error if raised.
+func (b MethodBuilderFunc) Exec(f *Fetcher) error {
+	m, err := b()
+	if err != nil {
+		return err
+	}
+	f.Method = m
+	return nil
+
 }
 
 //MethodBuilderProvider method builder provider
@@ -160,12 +194,31 @@ type MethodBuilderProvider interface {
 
 //MethodBuilder command which modify fetcher method by given method builder provider.
 func MethodBuilder(p MethodBuilderProvider) Command {
-	return CommandFunc(func(f *Fetcher) error {
-		m, err := p.RequestMethod()
-		if err != nil {
-			return err
-		}
-		f.Method = m
-		return nil
-	})
+	return MethodBuilderFunc(p.RequestMethod)
+}
+
+//ParamsBuilderFunc param builde func type
+type ParamsBuilderFunc func(url.Values) error
+
+//Exec exec command to modify fetcher.
+//Return any error if raised.
+func (b ParamsBuilderFunc) Exec(f *Fetcher) error {
+	params := f.URL.Query()
+	err := b(params)
+	if err != nil {
+		return err
+	}
+	f.URL.RawQuery = params.Encode()
+	return nil
+
+}
+
+//ParamsBuilderProvier params builde provider
+type ParamsBuilderProvier interface {
+	BuildParams(url.Values) error
+}
+
+//ParamsBuilder command which modify fetcher header by given params builder provider.
+func ParamsBuilder(p ParamsBuilderProvier) Command {
+	return ParamsBuilderFunc(p.BuildParams)
 }

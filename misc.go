@@ -2,17 +2,7 @@ package fetcher
 
 import (
 	"net/http"
-	"net/url"
 )
-
-//CloneURL clone http url
-func CloneURL(u *url.URL) *url.URL {
-	newurl, err := url.Parse(u.String())
-	if err != nil {
-		panic(err)
-	}
-	return newurl
-}
 
 //CloneHeader clone http header
 func CloneHeader(h http.Header) http.Header {

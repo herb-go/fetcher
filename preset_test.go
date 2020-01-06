@@ -99,3 +99,28 @@ func TestClonePreset(t *testing.T) {
 		t.Fatal(p)
 	}
 }
+func TestWithPreset(t *testing.T) {
+	cmds := []Command{
+		CommandFunc(func(*Fetcher) error { return nil }),
+	}
+	p := NewPreset().With(cmds...)
+	p2 := p.With(nil)
+	if p.Commands()[0] == nil {
+		t.Fatal(p)
+	}
+	if p2.Commands()[0] == nil {
+		t.Fatal(p)
+	}
+	cmds[0] = nil
+	if p.Commands()[0] == nil {
+		t.Fatal(p)
+	}
+	if p2.Commands()[0] == nil {
+		t.Fatal(p)
+	}
+	p.Commands()[0] = nil
+	if p2.Commands()[0] == nil {
+		t.Fatal(p)
+	}
+
+}

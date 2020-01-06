@@ -3,22 +3,11 @@ package fetcher
 import (
 	"bytes"
 	"net/http"
-	"net/url"
 	"testing"
 )
 
 func TestMisc(t *testing.T) {
-	url, err := url.Parse("abcs")
-	if err != nil {
-		t.Fatal(err)
-	}
-	url2 := CloneURL(url)
-	if url2 == url {
-		t.Fatal(url2)
-	}
-	if url2.String() != url.String() {
-		t.Fatal(url2)
-	}
+	var err error
 	header := http.Header{}
 	header.Set("abc", "123")
 	header2 := CloneHeader(header)

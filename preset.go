@@ -3,7 +3,6 @@ package fetcher
 import (
 	"io"
 	"net/http"
-	"net/url"
 )
 
 //Preset fetch preset.
@@ -17,13 +16,17 @@ func (p *Preset) Exec(f *Fetcher) error {
 
 //With clone preset with commands.
 func (p *Preset) With(cmds ...Command) *Preset {
-	preset := BuildPreset(append(*p, cmds...)...)
-	return preset
+	c := []Command{}
+	c = append(c, p.Commands()...)
+	c = append(c, cmds...)
+	preset := Preset(c)
+	return &preset
 }
 
 //Append clone and append preset with given presets in order.
 func (p *Preset) Append(presets ...*Preset) *Preset {
-	var cmds = p.Commands()
+	cmds := []Command{}
+	cmds = append(cmds, p.Commands()...)
 	for k := range presets {
 		cmds = append(cmds, presets[k].Commands()...)
 	}
@@ -97,11 +100,7 @@ type ServerInfo struct {
 //CreatePreset create new preset.
 //Return preset created and any error raised.
 func (s *ServerInfo) CreatePreset() (*Preset, error) {
-	u, err := url.Parse(s.URL)
-	if err != nil {
-		return nil, err
-	}
-	p := BuildPreset(URL(u), Method(s.Method), Header(s.Header))
+	p := BuildPreset(URL(s.URL), Method(s.Method), Header(s.Header))
 	return p, nil
 }
 
