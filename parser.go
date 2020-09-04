@@ -113,7 +113,7 @@ func FetchAndParse(preset *Preset, parser Parser) (*Response, error) {
 	}
 	err = parser.Parse(resp)
 	if err != nil {
-		return nil, err
+		return resp, err
 	}
 	return resp, nil
 }
