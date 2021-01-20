@@ -9,6 +9,14 @@ import (
 	"strings"
 )
 
+//ParsedURL create new command which modify fetcher url to given prased url
+func ParsedURL(u *url.URL) Command {
+	return CommandFunc(func(f *Fetcher) error {
+		f.URL = u
+		return nil
+	})
+}
+
 //URL create new command which modify fetcher url to given url
 func URL(u string) Command {
 	return CommandFunc(func(f *Fetcher) error {
