@@ -105,7 +105,6 @@ func GetAPIErrCode(err error) string {
 		return r.Code
 	}
 	return ""
-
 }
 
 //GetAPIErrContent get api error code form error.
@@ -122,4 +121,10 @@ func GetAPIErrContent(err error) string {
 //CompareAPIErrCode if check error is an ApiCodeErr with given api err code.
 func CompareAPIErrCode(err error, code interface{}) bool {
 	return GetAPIErrCode(err) == fmt.Sprint(code)
+}
+
+//IsResponseErr ehech if is response error
+func IsResponseErr(err error) bool {
+	_, ok := err.(*Response)
+	return ok
 }
