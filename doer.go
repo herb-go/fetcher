@@ -47,6 +47,13 @@ type Client struct {
 	doer   Doer
 }
 
+//Exec exec command to modify fetcher.
+//Return any error if raised.
+func (c *Client) Exec(f *Fetcher) error {
+	f.Doer = c
+	return nil
+}
+
 //CreateDoer create doer.
 //Return doer createrd and any error if raised.
 func (c *Client) CreateDoer() (Doer, error) {
