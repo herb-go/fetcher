@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 )
 
 //ErrMsgLengthLimit max error message length
@@ -90,7 +91,7 @@ type APICodeErr struct {
 //Error used as a error which return request url,request status,erro code,request content.
 //Error max length is ErrMsgLengthLimit.
 func (r *APICodeErr) Error() string {
-	msg := fmt.Sprintf("fetcher:api error [%s %s] code %s : %s", r.URI, r.Method, r.Code, string(r.Content))
+	msg := fmt.Sprintf("fetcher:api error [%s %s] code %s : %s", r.URI, r.Method, r.Code, url.PathEscape(string(r.Content)[:ErrMsgLengthLimit]))
 	if len(msg) > ErrMsgLengthLimit {
 		msg = msg[:ErrMsgLengthLimit]
 	}
