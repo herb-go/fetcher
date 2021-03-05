@@ -91,11 +91,23 @@ type APICodeErr struct {
 //Error used as a error which return request url,request status,erro code,request content.
 //Error max length is ErrMsgLengthLimit.
 func (r *APICodeErr) Error() string {
-	msg := fmt.Sprintf("fetcher:api error [%s %s] code %s : %s", r.URI, r.Method, r.Code, url.PathEscape(string(r.Content)[:ErrMsgLengthLimit]))
+	c := string(r.Content)
+	if len(c) > ErrMsgLengthLimit {
+		c = c[:ErrMsgLengthLimit]
+	}
+	msg := fmt.Sprintf("fetcher:api error [%s %s] code %s : %s", r.URI, r.Method, r.Code, url.PathEscape(c))
 	if len(msg) > ErrMsgLengthLimit {
 		msg = msg[:ErrMsgLengthLimit]
 	}
 	return msg
+}
+
+//ErrorPrivateRef error private ref
+func (r *APICodeErr) ErrorPrivateRef() string {
+	if r.Code == "" {
+		return ""
+	}
+	return fmt.Sprintf("code-%s", r.Code)
 }
 
 //GetAPIErrCode get api error code form error.

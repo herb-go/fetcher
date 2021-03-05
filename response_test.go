@@ -60,4 +60,14 @@ func TestAsError(t *testing.T) {
 	if len(errcodemsg) != ErrMsgLengthLimit {
 		t.Fatal(errcodemsg)
 	}
+	errcode = resp.NewAPICodeErr("")
+	errcodemsg = errcode.(*APICodeErr).ErrorPrivateRef()
+	if errcodemsg != "" {
+		t.Fatal(errcodemsg)
+	}
+	errcode = resp.NewAPICodeErr("999")
+	errcodemsg = errcode.(*APICodeErr).ErrorPrivateRef()
+	if !strings.Contains(errcodemsg, "999") {
+		t.Fatal(errcodemsg)
+	}
 }
