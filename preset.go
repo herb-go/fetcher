@@ -104,6 +104,12 @@ func (s *ServerInfo) CreatePreset() (*Preset, error) {
 	return p, nil
 }
 
+//IsEmpty check if server info is empty
+//IsEmpty will return true if equal nil or s.URL is empty string
+func (s *ServerInfo) IsEmpty() bool {
+	return s == nil || s.URL == ""
+}
+
 //Server http server config struct
 type Server struct {
 	ServerInfo
