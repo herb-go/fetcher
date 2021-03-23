@@ -121,29 +121,29 @@ func FetchAndParse(preset *Preset, parser Parser) (*Response, error) {
 //DoAndParse do request and prase response with given doer,preset and parser if no error raised.
 //Return response fetched and any error raised when fetching or parsing.
 func DoAndParse(doer Doer, preset *Preset, parser Parser) (*Response, error) {
-	return FetchAndParse(preset.With(SetDoer(doer)), parser)
+	return FetchAndParse(preset.CloneWith(SetDoer(doer)), parser)
 }
 
 //FetchWithBodyAndParse fetch request and prase response with given preset ,body and parser if no error raised.
 //Return response fetched and any error raised when fetching or parsing.
 func FetchWithBodyAndParse(preset *Preset, body io.Reader, parser Parser) (*Response, error) {
-	return FetchAndParse(preset.With(Body(body)), parser)
+	return FetchAndParse(preset.CloneWith(Body(body)), parser)
 }
 
 //FetchWithJSONBodyAndParse fetch request and prase response with given preset , body as json and parser if no error raised.
 //Return response fetched and any error raised when fetching or parsing.
 func FetchWithJSONBodyAndParse(preset *Preset, body interface{}, parser Parser) (*Response, error) {
-	return FetchAndParse(preset.With(JSONBody(body)), parser)
+	return FetchAndParse(preset.CloneWith(JSONBody(body)), parser)
 }
 
 //DoWithBodyAndParse do request and prase response with given doer,preset,body and parser if no error raised.
 //Return response fetched and any error raised when fetching or parsing.
 func DoWithBodyAndParse(doer Doer, preset *Preset, body io.Reader, parser Parser) (*Response, error) {
-	return FetchAndParse(preset.With(SetDoer(doer), Body(body)), parser)
+	return FetchAndParse(preset.CloneWith(SetDoer(doer), Body(body)), parser)
 }
 
 //DoWithJSONBodyAndParse do request and prase response with given doer,preset,body as json and parser if no error raised.
 //Return response fetched and any error raised when fetching or parsing.
 func DoWithJSONBodyAndParse(doer Doer, preset *Preset, body interface{}, parser Parser) (*Response, error) {
-	return FetchAndParse(preset.With(SetDoer(doer), JSONBody(body)), parser)
+	return FetchAndParse(preset.CloneWith(SetDoer(doer), JSONBody(body)), parser)
 }

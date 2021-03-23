@@ -83,7 +83,7 @@ func TestClonePreset(t *testing.T) {
 	cmds := []Command{
 		CommandFunc(func(*Fetcher) error { return nil }),
 	}
-	p := NewPreset().With(cmds...)
+	p := NewPreset().CloneWith(cmds...)
 	p2 := BuildPreset(cmds...)
 	if p.Commands()[0] == nil {
 		t.Fatal(p)
@@ -103,8 +103,8 @@ func TestWithPreset(t *testing.T) {
 	cmds := []Command{
 		CommandFunc(func(*Fetcher) error { return nil }),
 	}
-	p := NewPreset().With(cmds...)
-	p2 := p.With(nil)
+	p := NewPreset().CloneWith(cmds...)
+	p2 := p.CloneWith(nil)
 	if p.Commands()[0] == nil {
 		t.Fatal(p)
 	}

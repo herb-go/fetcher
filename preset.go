@@ -14,8 +14,8 @@ func (p *Preset) Exec(f *Fetcher) error {
 	return Exec(f, p.Commands()...)
 }
 
-//With clone preset with commands.
-func (p *Preset) With(cmds ...Command) *Preset {
+//CloneWith clone preset with commands.
+func (p *Preset) CloneWith(cmds ...Command) *Preset {
 	c := []Command{}
 	c = append(c, p.Commands()...)
 	c = append(c, cmds...)
@@ -40,14 +40,14 @@ func (p *Preset) Commands() []Command {
 
 //EndPoint create new preset with given pathprefix and method.
 func (p *Preset) EndPoint(method string, pathprefix string) *Preset {
-	return p.With(PathPrefix(pathprefix), Method(method))
+	return p.CloneWith(PathPrefix(pathprefix), Method(method))
 }
 
 //Fetch fetch request.
 //Preset and commands will exec on new fetcher by which fetching response.
 //Return http response and any error if raised.
 func (p *Preset) Fetch(cmds ...Command) (*Response, error) {
-	return Fetch(p.With(cmds...).Commands()...)
+	return Fetch(p.CloneWith(cmds...).Commands()...)
 }
 
 //FetchWithBody fetch request with given body.
@@ -71,7 +71,7 @@ func (p *Preset) FetchWithBodyAndParse(body io.Reader, preset Parser) (*Response
 //FetchWithJSONBodyAndParse fetch request and prase response with given preset ,body as json and parser if no error raised.
 //Return response fetched and any error raised when fetching or parsing.
 func (p *Preset) FetchWithJSONBodyAndParse(body interface{}, preset Parser) (*Response, error) {
-	return FetchAndParse(p.With(JSONBody(body)), preset)
+	return FetchAndParse(p.CloneWith(JSONBody(body)), preset)
 }
 
 //NewPreset create new preset
@@ -129,7 +129,7 @@ func (s *Server) CreatePreset() (*Preset, error) {
 	if err != nil {
 		return nil, err
 	}
-	return p.With(SetDoer(doer)), nil
+	return p.CloneWith(SetDoer(doer)), nil
 }
 
 //PresetFactory preset factory.
