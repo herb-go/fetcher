@@ -79,32 +79,6 @@ func TestPresetMethods(t *testing.T) {
 	}
 }
 
-func TestWithPreset(t *testing.T) {
-	cmds := []Command{
-		CommandFunc(func(*Fetcher) error { return nil }),
-	}
-	p := NewPreset().Concat(cmds...)
-	p2 := p.Concat(nil)
-	if p.Commands()[0] == nil {
-		t.Fatal(p)
-	}
-	if p2.Commands()[0] == nil {
-		t.Fatal(p)
-	}
-	cmds[0] = nil
-	if p.Commands()[0] == nil {
-		t.Fatal(p)
-	}
-	if p2.Commands()[0] == nil {
-		t.Fatal(p)
-	}
-	p.Commands()[0] = nil
-	if p2.Commands()[0] == nil {
-		t.Fatal(p)
-	}
-
-}
-
 func TestOrder(t *testing.T) {
 	cmd1 := CommandFunc(func(f *Fetcher) error { f.URL.Path = f.URL.Path + "cmd1"; return nil })
 	cmd2 := CommandFunc(func(f *Fetcher) error { f.URL.Path = f.URL.Path + "cmd2"; return nil })
