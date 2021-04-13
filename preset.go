@@ -123,7 +123,7 @@ func NewPreset() *Preset {
 	return nil
 }
 
-//Concat create with given commands.
+//Concat create preset with given commands.
 func Concat(cmds ...Command) *Preset {
 	return NewPreset().Concat(cmds...)
 }
