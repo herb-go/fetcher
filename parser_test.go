@@ -21,29 +21,29 @@ func TestParser(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, err = FetchAndParse(preset.CloneWith(SetQuery("statuscode", "206")), Should200(nil))
+	_, err = FetchAndParse(preset.Concat(SetQuery("statuscode", "206")), Should200(nil))
 	if err == nil {
 		t.Fatal(err)
 	}
-	_, err = FetchAndParse(preset.CloneWith(SetQuery("statuscode", "206")), ShouldSuccess(nil))
+	_, err = FetchAndParse(preset.Concat(SetQuery("statuscode", "206")), ShouldSuccess(nil))
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, err = FetchAndParse(preset.CloneWith(SetQuery("statuscode", "404")), ShouldNoError(nil))
+	_, err = FetchAndParse(preset.Concat(SetQuery("statuscode", "404")), ShouldNoError(nil))
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, err = FetchAndParse(preset.CloneWith(SetQuery("statuscode", "303")), ShouldSuccess(nil))
+	_, err = FetchAndParse(preset.Concat(SetQuery("statuscode", "303")), ShouldSuccess(nil))
 	if err == nil {
 		t.Fatal(err)
 	}
-	_, err = FetchAndParse(preset.CloneWith(SetQuery("statuscode", "504")), ShouldNoError(nil))
+	_, err = FetchAndParse(preset.Concat(SetQuery("statuscode", "504")), ShouldNoError(nil))
 	if err == nil {
 		t.Fatal(err)
 	}
 
 	result = []byte{'a', 'b', 'c'}
-	_, err = FetchAndParse(preset.CloneWith(SetQuery("statuscode", "200")), Should200(AsBytes(&result)))
+	_, err = FetchAndParse(preset.Concat(SetQuery("statuscode", "200")), Should200(AsBytes(&result)))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -51,7 +51,7 @@ func TestParser(t *testing.T) {
 		t.Fatal(result)
 	}
 	result = []byte{'a', 'b', 'c'}
-	_, err = DoAndParse(nil, preset.CloneWith(SetQuery("statuscode", "306")), Should200(AsBytes(&result)))
+	_, err = DoAndParse(nil, preset.Concat(SetQuery("statuscode", "306")), Should200(AsBytes(&result)))
 	if err == nil {
 		t.Fatal(err)
 	}
@@ -60,7 +60,7 @@ func TestParser(t *testing.T) {
 	}
 
 	resultstr = ""
-	_, err = FetchWithBodyAndParse(preset.CloneWith(SetQuery("statuscode", "206")), bytes.NewBufferString("statuscode206"), ShouldSuccess(AsString(&resultstr)))
+	_, err = FetchWithBodyAndParse(preset.Concat(SetQuery("statuscode", "206")), bytes.NewBufferString("statuscode206"), ShouldSuccess(AsString(&resultstr)))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -68,7 +68,7 @@ func TestParser(t *testing.T) {
 		t.Fatal(resultstr)
 	}
 	resultstr = ""
-	_, err = DoWithBodyAndParse(nil, preset.CloneWith(SetQuery("statuscode", "306")), bytes.NewBufferString("statuscode306"), ShouldSuccess(AsString(&resultstr)))
+	_, err = DoWithBodyAndParse(nil, preset.Concat(SetQuery("statuscode", "306")), bytes.NewBufferString("statuscode306"), ShouldSuccess(AsString(&resultstr)))
 	if err == nil {
 		t.Fatal(err)
 	}
@@ -76,7 +76,7 @@ func TestParser(t *testing.T) {
 		t.Fatal(resultstr)
 	}
 	resultstr = ""
-	_, err = FetchWithJSONBodyAndParse(preset.CloneWith(SetQuery("statuscode", "406")), "statuscode406", ShouldNoError(AsJSON(&resultstr)))
+	_, err = FetchWithJSONBodyAndParse(preset.Concat(SetQuery("statuscode", "406")), "statuscode406", ShouldNoError(AsJSON(&resultstr)))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -84,7 +84,7 @@ func TestParser(t *testing.T) {
 		t.Fatal(resultstr)
 	}
 	resultstr = ""
-	_, err = DoWithJSONBodyAndParse(nil, preset.CloneWith(SetQuery("statuscode", "504")), "statuscode504", ShouldNoError(AsJSON(&resultstr)))
+	_, err = DoWithJSONBodyAndParse(nil, preset.Concat(SetQuery("statuscode", "504")), "statuscode504", ShouldNoError(AsJSON(&resultstr)))
 	if err == nil {
 		t.Fatal(err)
 	}

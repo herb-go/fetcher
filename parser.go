@@ -107,7 +107,7 @@ func AsJSON(v interface{}) Parser {
 //FetchAndParse fetch request and prase response with given preset and parser if no error raised.
 //Return response fetched and any error raised when fetching or parsing.
 func FetchAndParse(preset *Preset, parser Parser) (*Response, error) {
-	resp, err := Fetch(preset.Commands()...)
+	resp, err := Fetch(preset)
 	if err != nil {
 		return nil, err
 	}
@@ -121,29 +121,29 @@ func FetchAndParse(preset *Preset, parser Parser) (*Response, error) {
 //DoAndParse do request and prase response with given doer,preset and parser if no error raised.
 //Return response fetched and any error raised when fetching or parsing.
 func DoAndParse(doer Doer, preset *Preset, parser Parser) (*Response, error) {
-	return FetchAndParse(preset.CloneWith(SetDoer(doer)), parser)
+	return FetchAndParse(preset.Concat(SetDoer(doer)), parser)
 }
 
 //FetchWithBodyAndParse fetch request and prase response with given preset ,body and parser if no error raised.
 //Return response fetched and any error raised when fetching or parsing.
 func FetchWithBodyAndParse(preset *Preset, body io.Reader, parser Parser) (*Response, error) {
-	return FetchAndParse(preset.CloneWith(Body(body)), parser)
+	return FetchAndParse(preset.Concat(Body(body)), parser)
 }
 
 //FetchWithJSONBodyAndParse fetch request and prase response with given preset , body as json and parser if no error raised.
 //Return response fetched and any error raised when fetching or parsing.
 func FetchWithJSONBodyAndParse(preset *Preset, body interface{}, parser Parser) (*Response, error) {
-	return FetchAndParse(preset.CloneWith(JSONBody(body)), parser)
+	return FetchAndParse(preset.Concat(JSONBody(body)), parser)
 }
 
 //DoWithBodyAndParse do request and prase response with given doer,preset,body and parser if no error raised.
 //Return response fetched and any error raised when fetching or parsing.
 func DoWithBodyAndParse(doer Doer, preset *Preset, body io.Reader, parser Parser) (*Response, error) {
-	return FetchAndParse(preset.CloneWith(SetDoer(doer), Body(body)), parser)
+	return FetchAndParse(preset.Concat(SetDoer(doer), Body(body)), parser)
 }
 
 //DoWithJSONBodyAndParse do request and prase response with given doer,preset,body as json and parser if no error raised.
 //Return response fetched and any error raised when fetching or parsing.
 func DoWithJSONBodyAndParse(doer Doer, preset *Preset, body interface{}, parser Parser) (*Response, error) {
-	return FetchAndParse(preset.CloneWith(SetDoer(doer), JSONBody(body)), parser)
+	return FetchAndParse(preset.Concat(SetDoer(doer), JSONBody(body)), parser)
 }

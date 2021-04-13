@@ -79,32 +79,12 @@ func TestPresetMethods(t *testing.T) {
 	}
 }
 
-func TestClonePreset(t *testing.T) {
-	cmds := []Command{
-		CommandFunc(func(*Fetcher) error { return nil }),
-	}
-	p := NewPreset().CloneWith(cmds...)
-	p2 := BuildPreset(cmds...)
-	if p.Commands()[0] == nil {
-		t.Fatal(p)
-	}
-	if p2.Commands()[0] == nil {
-		t.Fatal(p)
-	}
-	cmds[0] = nil
-	if p.Commands()[0] == nil {
-		t.Fatal(p)
-	}
-	if p2.Commands()[0] == nil {
-		t.Fatal(p)
-	}
-}
 func TestWithPreset(t *testing.T) {
 	cmds := []Command{
 		CommandFunc(func(*Fetcher) error { return nil }),
 	}
-	p := NewPreset().CloneWith(cmds...)
-	p2 := p.CloneWith(nil)
+	p := NewPreset().Concat(cmds...)
+	p2 := p.Concat(nil)
 	if p.Commands()[0] == nil {
 		t.Fatal(p)
 	}
@@ -123,4 +103,69 @@ func TestWithPreset(t *testing.T) {
 		t.Fatal(p)
 	}
 
+}
+
+func TestOrder(t *testing.T) {
+	cmd1 := CommandFunc(func(f *Fetcher) error { f.URL.Path = f.URL.Path + "cmd1"; return nil })
+	cmd2 := CommandFunc(func(f *Fetcher) error { f.URL.Path = f.URL.Path + "cmd2"; return nil })
+	cmd3 := CommandFunc(func(f *Fetcher) error { f.URL.Path = f.URL.Path + "cmd3"; return nil })
+	cmd4 := CommandFunc(func(f *Fetcher) error { f.URL.Path = f.URL.Path + "cmd4"; return nil })
+	cmd5 := CommandFunc(func(f *Fetcher) error { f.URL.Path = f.URL.Path + "cmd5"; return nil })
+	p := NewPreset().CloneWith(cmd1, cmd2, cmd3, cmd4, cmd5)
+	f := New()
+	err := Exec(f, p)
+	if err != nil {
+		panic(err)
+	}
+	if f.URL.Path != "cmd1cmd2cmd3cmd4cmd5" {
+		t.Fatal(f.URL.Path)
+	}
+
+	f = New()
+	err = Exec(f, p.Commands()...)
+	if err != nil {
+		panic(err)
+	}
+	if f.URL.Path != "cmd1cmd2cmd3cmd4cmd5" {
+		t.Fatal(f.URL.Path)
+	}
+
+	p = NewPreset().Concat(cmd1, cmd2).Concat(cmd3, cmd4, cmd5)
+	f = New()
+	err = Exec(f, p.Commands()...)
+	if err != nil {
+		panic(err)
+	}
+	if f.URL.Path != "cmd1cmd2cmd3cmd4cmd5" {
+		t.Fatal(f.URL.Path)
+	}
+
+	p = NewPreset().Append(NewPreset().Concat(cmd1, cmd2)).Append(NewPreset().Concat(cmd3, cmd4, cmd5))
+	f = New()
+	err = Exec(f, p.Commands()...)
+	if err != nil {
+		panic(err)
+	}
+	if f.URL.Path != "cmd1cmd2cmd3cmd4cmd5" {
+		t.Fatal(f.URL.Path)
+	}
+	p = NewPreset().Append(NewPreset().Concat(cmd1, cmd2), NewPreset().Concat(cmd3, cmd4, cmd5))
+	f = New()
+	err = Exec(f, p.Commands()...)
+	if err != nil {
+		panic(err)
+	}
+	if f.URL.Path != "cmd1cmd2cmd3cmd4cmd5" {
+		t.Fatal(f.URL.Path)
+	}
+
+	p = NewPreset().Append(NewPreset().Concat(cmd1, cmd2)).Concat(cmd3, cmd4, cmd5)
+	f = New()
+	err = Exec(f, p.Commands()...)
+	if err != nil {
+		panic(err)
+	}
+	if f.URL.Path != "cmd1cmd2cmd3cmd4cmd5" {
+		t.Fatal(f.URL.Path)
+	}
 }
