@@ -29,6 +29,12 @@ func (p *Preset) Exec(f *Fetcher) error {
 func (p *Preset) CloneWith(cmds ...Command) *Preset {
 	return p.Concat(cmds...)
 }
+
+// With clone preset with commands.
+// Alias for Concat
+func (p *Preset) With(cmds ...Command) *Preset {
+	return p.Concat(cmds...)
+}
 func (p *Preset) concatCommand(cmd Command) *Preset {
 	return &Preset{
 		prev:    p,
@@ -115,6 +121,11 @@ func (p *Preset) FetchWithJSONBodyAndParse(body interface{}, preset Parser) (*Re
 //NewPreset create new preset
 func NewPreset() *Preset {
 	return nil
+}
+
+//Concat create with given commands.
+func Concat(cmds ...Command) *Preset {
+	return NewPreset().Concat(cmds...)
 }
 
 //BuildPreset build new preset with given commands
