@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"io"
+	"mime/multipart"
 	"net/http"
 	"net/url"
 	"strings"
@@ -259,4 +260,27 @@ type ParamsBuilderProvier interface {
 //ParamsBuilder command which modify fetcher header by given params builder provider.
 func ParamsBuilder(p ParamsBuilderProvier) Command {
 	return ParamsBuilderFunc(p.BuildParams)
+}
+
+//MultiPartWriter multipart writer command
+type MultiPartWriter struct {
+	body *bytes.Buffer
+	*multipart.Writer
+}
+
+//Exec exec command to modify fetcher.
+//Return any error if raised.
+func (w *MultiPartWriter) Exec(f *Fetcher) error {
+	f.Body = w.body
+	return nil
+}
+
+//NewMultiPartWriter create new MultiPartWriter command
+func NewMultiPartWriter() *MultiPartWriter {
+	buf := bytes.NewBuffer(nil)
+	writer := multipart.NewWriter(buf)
+	return &MultiPartWriter{
+		body:   buf,
+		Writer: writer,
+	}
 }
