@@ -275,6 +275,16 @@ func (w *MultiPartWriter) Exec(f *Fetcher) error {
 	return nil
 }
 
+//WriterFile write file with given fieldname,filename and data
+func (w *MultiPartWriter) WriterFile(fieldname, filename string, src io.Reader) error {
+	writer, err := w.CreateFormFile(fieldname, filename)
+	if err != nil {
+		return err
+	}
+	_, err = io.Copy(writer, src)
+	return err
+}
+
 //NewMultiPartWriter create new MultiPartWriter command
 func NewMultiPartWriter() *MultiPartWriter {
 	buf := bytes.NewBuffer(nil)
