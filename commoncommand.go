@@ -275,8 +275,8 @@ func (w *MultiPartWriter) Exec(f *Fetcher) error {
 	return nil
 }
 
-//WriterFile write file with given fieldname,filename and data
-func (w *MultiPartWriter) WriterFile(fieldname, filename string, src io.Reader) error {
+//WriteFile write file with given fieldname,filename and data
+func (w *MultiPartWriter) WriteFile(fieldname, filename string, src io.Reader) error {
 	writer, err := w.CreateFormFile(fieldname, filename)
 	if err != nil {
 		return err
