@@ -272,6 +272,7 @@ type MultiPartWriter struct {
 //Return any error if raised.
 func (w *MultiPartWriter) Exec(f *Fetcher) error {
 	f.Body = w.body
+	f.Header.Set("Content-Type", w.FormDataContentType())
 	return nil
 }
 
