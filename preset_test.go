@@ -67,16 +67,17 @@ func TestPresetMethods(t *testing.T) {
 	if len(cmds) != 4 || cmds[0] == nil || cmds[1] == nil || cmds[2] != nil || cmds[3] != nil {
 		t.Fatal(pnil)
 	}
-	p = NewPreset().EndPoint("TESTMETHOD", "/pathprefix")
+	p = NewPreset().EndPoint("TESTMETHOD", "/pathsuffix")
 	f := New()
 	f.URL.Path = "raw"
 	err = p.Exec(f)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if f.URL.Path != "raw/pathprefix" || f.Method != "TESTMETHOD" {
+	if f.URL.Path != "raw/pathsuffix" || f.Method != "TESTMETHOD" {
 		t.Fatal(f)
 	}
+
 }
 
 func TestOrder(t *testing.T) {

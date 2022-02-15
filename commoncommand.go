@@ -56,6 +56,16 @@ type PathPrefix string
 //Exec exec command to modify fetcher.
 //Return any error if raised.
 func (p PathPrefix) Exec(f *Fetcher) error {
+	f.URL.Path = string(p) + f.URL.Path
+	return nil
+}
+
+//PathSuffix command which modify fetcher url with given path suffix
+type PathSuffix string
+
+//Exec exec command to modify fetcher.
+//Return any error if raised.
+func (p PathSuffix) Exec(f *Fetcher) error {
 	f.URL.Path = f.URL.Path + string(p)
 	return nil
 }

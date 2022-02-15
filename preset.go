@@ -82,9 +82,9 @@ func (p *Preset) Commands() []Command {
 	return cmds
 }
 
-//EndPoint create new preset with given pathprefix and method.
-func (p *Preset) EndPoint(method string, pathprefix string) *Preset {
-	return p.Concat(PathPrefix(pathprefix), Method(method))
+//EndPoint create new preset with given suffix and method.
+func (p *Preset) EndPoint(method string, suffix string) *Preset {
+	return p.Concat(PathSuffix(suffix), Method(method))
 }
 
 //Fetch fetch request.

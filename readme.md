@@ -31,6 +31,7 @@
 * Method 请求方式命令
 * Replace 替换地址中路径部分命令
 * PathPrefix 将路径加入指定前缀命令
+* PathSuffix 将路径加入指定后缀命令
 * Body 指定请求正文命令
 * JSONBody 将对象以JSON格式序列化为正文命令
 * Header 添加请求头命令
