@@ -3,6 +3,7 @@ package fetcher
 import (
 	"io"
 	"net/http"
+	"path"
 )
 
 //Preset fetch preset.
@@ -143,6 +144,20 @@ type ServerInfo struct {
 	Method string
 }
 
+//MergeURL clone and merge with given url
+func (s *ServerInfo) MergeURL(url string) *ServerInfo {
+	si := s.Clone()
+	si.URL = url
+	return si
+}
+
+//Join clone and join with given urlpath
+func (s *ServerInfo) Join(urlpath string) *ServerInfo {
+	si := s.Clone()
+	si.URL = path.Join(si.URL, urlpath)
+	return si
+}
+
 //CreatePreset create new preset.
 //Return preset created and any error raised.
 func (s *ServerInfo) CreatePreset() (*Preset, error) {
@@ -192,6 +207,22 @@ func (s *Server) CreatePreset() (*Preset, error) {
 func (s *Server) Clone() *Server {
 	return &Server{
 		ServerInfo: *s.ServerInfo.Clone(),
+		Client:     *s.Client.Clone(),
+	}
+}
+
+//MergeURL clone and merge with given url
+func (s *Server) MergeURL(url string) *Server {
+	return &Server{
+		ServerInfo: *s.ServerInfo.MergeURL(url),
+		Client:     *s.Client.Clone(),
+	}
+}
+
+//Join clone and join with given urlpath
+func (s *Server) Join(urlpath string) *Server {
+	return &Server{
+		ServerInfo: *s.ServerInfo.Join(urlpath),
 		Client:     *s.Client.Clone(),
 	}
 }
