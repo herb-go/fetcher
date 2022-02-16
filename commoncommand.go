@@ -7,6 +7,7 @@ import (
 	"mime/multipart"
 	"net/http"
 	"net/url"
+	"path"
 	"strings"
 )
 
@@ -68,6 +69,16 @@ type PathSuffix string
 //Return any error if raised.
 func (p PathSuffix) Exec(f *Fetcher) error {
 	f.URL.Path = f.URL.Path + string(p)
+	return nil
+}
+
+//PathJoin command which modify fetcher url join with given path
+type PathJoin string
+
+//Exec exec command to modify fetcher.
+//Return any error if raised.
+func (p PathJoin) Exec(f *Fetcher) error {
+	f.URL.Path = path.Join(f.URL.Path, string(p))
 	return nil
 }
 

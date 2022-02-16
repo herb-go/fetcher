@@ -47,6 +47,17 @@ type Client struct {
 	doer   Doer
 }
 
+//Clone clone a new client.
+func (c *Client) Clone() *Client {
+	return &Client{
+		TimeoutInSecond:             c.TimeoutInSecond,
+		MaxIdleConns:                c.MaxIdleConns,
+		IdleConnTimeoutInSecond:     c.IdleConnTimeoutInSecond,
+		TLSHandshakeTimeoutInSecond: c.TLSHandshakeTimeoutInSecond,
+		Proxy:                       c.Proxy,
+	}
+}
+
 //Exec exec command to modify fetcher.
 //Return any error if raised.
 func (c *Client) Exec(f *Fetcher) error {

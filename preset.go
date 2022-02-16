@@ -156,6 +156,16 @@ func (s *ServerInfo) IsEmpty() bool {
 	return s == nil || s.URL == ""
 }
 
+//Clone clone a new serverinfo
+func (s *ServerInfo) Clone() *ServerInfo {
+	si := &ServerInfo{
+		URL:    s.URL,
+		Header: s.Header.Clone(),
+		Method: s.Method,
+	}
+	return si
+}
+
 //Server http server config struct
 type Server struct {
 	ServerInfo
@@ -176,6 +186,14 @@ func (s *Server) CreatePreset() (*Preset, error) {
 		return nil, err
 	}
 	return p.Concat(SetDoer(doer)), nil
+}
+
+//Clone clone a new server config
+func (s *Server) Clone() *Server {
+	return &Server{
+		ServerInfo: *s.ServerInfo.Clone(),
+		Client:     *s.Client.Clone(),
+	}
 }
 
 //PresetFactory preset factory.
