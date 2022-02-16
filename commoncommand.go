@@ -297,7 +297,8 @@ func (w *MultiPartWriter) WriteFile(fieldname, filename string, src io.Reader) e
 	return err
 }
 
-//NewMultiPartWriter create new MultiPartWriter command
+//NewMultiPartWriter create new MultiPartWriter command to upload file.
+//You should close writer before exec it.
 func NewMultiPartWriter() *MultiPartWriter {
 	buf := bytes.NewBuffer(nil)
 	writer := multipart.NewWriter(buf)

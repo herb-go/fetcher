@@ -131,13 +131,22 @@ func GetAPIErrContent(err error) string {
 
 }
 
-//CompareAPIErrCode if check error is an ApiCodeErr with given api err code.
+//CompareAPIErrCode check if error is an ApiCodeErr with given api err code.
 func CompareAPIErrCode(err error, code interface{}) bool {
 	return GetAPIErrCode(err) == fmt.Sprint(code)
 }
 
-//IsResponseErr ehech if is response error
+//IsResponseErr check if is response error
 func IsResponseErr(err error) bool {
 	_, ok := err.(*Response)
 	return ok
+}
+
+//CompareResponseErrStatusCode check if error is a ResponseErr with given status code.
+func CompareResponseErrStatusCode(err error, statuscode int) bool {
+	resp, ok := err.(*Response)
+	if !ok {
+		return false
+	}
+	return resp.StatusCode == statuscode
 }

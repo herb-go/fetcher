@@ -98,6 +98,9 @@ func TestProxy(t *testing.T) {
 		t.Fatal(err)
 	}
 	bs, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		panic(err)
+	}
 	defer resp.Body.Close()
 	if string(bs) != "proxied" {
 		t.Error(string(bs))
@@ -131,6 +134,9 @@ func TestNoProxy(t *testing.T) {
 		t.Fatal(err)
 	}
 	bs, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		panic(err)
+	}
 	defer resp.Body.Close()
 	if string(bs) != "notproxied" {
 		t.Error(string(bs))
@@ -159,6 +165,9 @@ func TestGzip(t *testing.T) {
 		t.Fatal(err)
 	}
 	bs, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		panic(err)
+	}
 	defer resp.Body.Close()
 	if string(bs) != "testtest" {
 		t.Error(string(bs))
@@ -177,4 +186,25 @@ func TestNilClient(t *testing.T) {
 		t.Fatal(err)
 	}
 	resp.Body.Close()
+}
+
+func TestClientExec(t *testing.T) {
+	f := New()
+	doer := &Client{}
+	err := doer.Exec(f)
+	if err != nil {
+		panic(err)
+	}
+	if f.Doer != doer {
+		t.Fatal(f)
+	}
+}
+
+func TestClientClone(t *testing.T) {
+	c := &Client{}
+	cloned := c.Clone()
+	c.Proxy = "1234"
+	if cloned.Proxy == c.Proxy {
+		t.Fatal(cloned)
+	}
 }

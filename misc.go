@@ -6,13 +6,7 @@ import (
 
 //CloneHeader clone http header
 func CloneHeader(h http.Header) http.Header {
-	header := http.Header{}
-	for name := range h {
-		for k := range h[name] {
-			header.Add(name, h[name][k])
-		}
-	}
-	return header
+	return h.Clone()
 }
 
 //MergeHeader merge src header to dst

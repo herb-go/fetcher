@@ -3,6 +3,7 @@ package fetcher
 import (
 	"io"
 	"net/http"
+	"net/url"
 	"path"
 )
 
@@ -151,10 +152,15 @@ func (s *ServerInfo) MergeURL(url string) *ServerInfo {
 	return si
 }
 
-//Join clone and join with given urlpath
-func (s *ServerInfo) Join(urlpath string) *ServerInfo {
+//MustJoin clone and join with given urlpath
+func (s *ServerInfo) MustJoin(urlpath string) *ServerInfo {
+	su, err := url.Parse(s.URL)
+	if err != nil {
+		panic(err)
+	}
+	su.Path = path.Join(su.Path, urlpath)
 	si := s.Clone()
-	si.URL = path.Join(si.URL, urlpath)
+	si.URL = su.String()
 	return si
 }
 
@@ -219,10 +225,10 @@ func (s *Server) MergeURL(url string) *Server {
 	}
 }
 
-//Join clone and join with given urlpath
-func (s *Server) Join(urlpath string) *Server {
+//MustJoin clone and join with given urlpath
+func (s *Server) MustJoin(urlpath string) *Server {
 	return &Server{
-		ServerInfo: *s.ServerInfo.Join(urlpath),
+		ServerInfo: *s.ServerInfo.MustJoin(urlpath),
 		Client:     *s.Client.Clone(),
 	}
 }

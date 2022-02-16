@@ -24,7 +24,7 @@ func TestMisc(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if bytes.Compare(data.Bytes(), data2.Bytes()) != 0 {
+	if !bytes.Equal(data.Bytes(), data2.Bytes()) {
 		t.Fatal(data2)
 	}
 	header3 := http.Header{}

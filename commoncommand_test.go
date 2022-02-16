@@ -4,8 +4,10 @@ import (
 	"bytes"
 	"encoding/json"
 	"io/ioutil"
+	"mime/multipart"
 	"net/http"
 	"net/url"
+	"strings"
 	"testing"
 )
 
@@ -158,6 +160,9 @@ func TestCommonCommand(t *testing.T) {
 		t.Fatal(f)
 	}
 	err = HeaderBuilder(&hbp{}).Exec(f)
+	if err != nil {
+		panic(err)
+	}
 	if f.Header.Get("k1") != "v1" {
 		t.Fatal(f)
 	}
@@ -166,6 +171,9 @@ func TestCommonCommand(t *testing.T) {
 		t.Fatal(f)
 	}
 	err = MethodBuilder(&mbp{}).Exec(f)
+	if err != nil {
+		panic(err)
+	}
 	if f.Method != "MethodBuilderProvider" {
 		t.Fatal(f)
 	}
@@ -174,6 +182,9 @@ func TestCommonCommand(t *testing.T) {
 		t.Fatal(f)
 	}
 	err = ParamsBuilder(&pp{}).Exec(f)
+	if err != nil {
+		panic(err)
+	}
 	if f.URL.Query().Get("id") != "test" {
 		t.Fatal(f)
 	}
@@ -188,6 +199,9 @@ func TestCommonCommand(t *testing.T) {
 		t.Fatal(u, p)
 	}
 	err = BasicAuth("user", "pw").Exec(f)
+	if err != nil {
+		panic(err)
+	}
 	r, _, err = f.Raw()
 	if err != nil {
 		t.Fatal(err)
@@ -195,6 +209,45 @@ func TestCommonCommand(t *testing.T) {
 	user, p, ok = r.BasicAuth()
 	if !ok || user != "user" || p != "pw" {
 		t.Fatal(u, p)
+	}
+	f = New()
+	pu, err := url.Parse("http://127.0.0.1")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = ParsedURL(pu).Exec(f)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if f.URL.String() != pu.String() {
+		t.Fatal()
+	}
+	f = New()
+	f.URL.Path = "raw"
+	err = PathPrefix("prefix").Exec(f)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if f.URL.Path != "prefixraw" {
+		t.Fatal(f)
+	}
+	f = New()
+	f.URL.Path = "raw"
+	err = PathSuffix("suffix").Exec(f)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if f.URL.Path != "rawsuffix" {
+		t.Fatal(f)
+	}
+	f = New()
+	f.URL.Path = "raw"
+	err = PathJoin("join").Exec(f)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if f.URL.Path != "raw/join" {
+		t.Fatal(f)
 	}
 }
 
@@ -258,6 +311,35 @@ func TestCommonCommantecho(t *testing.T) {
 	}
 	if f.Body != body {
 		t.Fatal(f)
+	}
+
+}
+
+func TestMultiPartWriter(t *testing.T) {
+	w := NewMultiPartWriter()
+	f := New()
+	err := w.WriteFile("file", "filename", bytes.NewBufferString("content"))
+	if err != nil {
+		panic(err)
+	}
+	err = w.Close()
+	if err != nil {
+		panic(err)
+	}
+	err = w.Exec(f)
+	if err != nil {
+		panic(err)
+	}
+	if !strings.HasPrefix(f.Header.Get("Content-Type"), "multipart/form-data;") {
+		t.Fatal(f)
+	}
+	form, err := multipart.NewReader(f.Body, w.Boundary()).ReadForm(20000)
+	if err != nil {
+		panic(err)
+	}
+	fs := form.File["file"]
+	if len(fs) != 1 || fs[0].Filename != "filename" {
+		t.Fatal(fs)
 	}
 
 }

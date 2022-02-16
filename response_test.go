@@ -26,7 +26,19 @@ func TestAsError(t *testing.T) {
 	if GetAPIErrCode(resp) != "" {
 		t.Fatal(resp)
 	}
+	if GetAPIErrContent(resp) != "" {
+		t.Fatal(resp)
+	}
 	if CompareAPIErrCode(resp, 200) != false {
+		t.Fatal(resp)
+	}
+	if !IsResponseErr(resp) {
+		t.Fatal(resp)
+	}
+	if !CompareResponseErrStatusCode(resp, 200) {
+		t.Fatal(resp)
+	}
+	if CompareResponseErrStatusCode(resp, 404) {
 		t.Fatal(resp)
 	}
 	errcode := resp.NewAPICodeErr("999")
@@ -36,6 +48,10 @@ func TestAsError(t *testing.T) {
 	}
 	if GetAPIErrCode(errcode) != "999" {
 		t.Fatal(resp)
+	}
+	errcontent := GetAPIErrContent(errcode)
+	if errcontent != "errbody" {
+		t.Fatal(errcontent)
 	}
 	if CompareAPIErrCode(errcode, 999) != true {
 		t.Fatal(resp)
@@ -69,5 +85,8 @@ func TestAsError(t *testing.T) {
 	errcodemsg = errcode.(*APICodeErr).ErrorPrivateRef()
 	if !strings.Contains(errcodemsg, "999") {
 		t.Fatal(errcodemsg)
+	}
+	if CompareResponseErrStatusCode(errcode, 200) {
+		t.Fatal(resp)
 	}
 }

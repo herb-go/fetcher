@@ -86,7 +86,7 @@ func TestOrder(t *testing.T) {
 	cmd3 := CommandFunc(func(f *Fetcher) error { f.URL.Path = f.URL.Path + "cmd3"; return nil })
 	cmd4 := CommandFunc(func(f *Fetcher) error { f.URL.Path = f.URL.Path + "cmd4"; return nil })
 	cmd5 := CommandFunc(func(f *Fetcher) error { f.URL.Path = f.URL.Path + "cmd5"; return nil })
-	p := NewPreset().CloneWith(cmd1, cmd2, cmd3, cmd4, cmd5)
+	p := Concat(cmd1, cmd2, cmd3, cmd4, cmd5)
 	f := New()
 	err := Exec(f, p)
 	if err != nil {
@@ -105,7 +105,7 @@ func TestOrder(t *testing.T) {
 		t.Fatal(f.URL.Path)
 	}
 
-	p = NewPreset().Concat(cmd1, cmd2).Concat(cmd3, cmd4, cmd5)
+	p = NewPreset().Concat(cmd1, cmd2).With(cmd3, cmd4, cmd5)
 	f = New()
 	err = Exec(f, p.Commands()...)
 	if err != nil {
@@ -142,5 +142,89 @@ func TestOrder(t *testing.T) {
 	}
 	if f.URL.Path != "cmd1cmd2cmd3cmd4cmd5" {
 		t.Fatal(f.URL.Path)
+	}
+}
+
+func TestEmptyServerInfo(t *testing.T) {
+	var si *ServerInfo
+	if !si.IsEmpty() {
+		t.Fatal(si)
+	}
+	si = &ServerInfo{}
+	if !si.IsEmpty() {
+		t.Fatal(si)
+	}
+	si.URL = "http://127.0.0.1"
+	if si.IsEmpty() {
+		t.Fatal(si)
+	}
+}
+
+func TestCloneServerInfo(t *testing.T) {
+	var si = &ServerInfo{}
+	var cloned = si.Clone()
+	si.Method = "GET"
+	if cloned.Method == si.Method {
+		t.Fatal(cloned)
+	}
+	si = &ServerInfo{
+		URL: "http://localhost",
+	}
+	cloned = si.MergeURL("http://127.0.0.1")
+	si.Method = "GET"
+	if cloned.Method == si.Method {
+		t.Fatal(cloned)
+	}
+	if cloned.URL != "http://127.0.0.1" {
+		t.Fatal(cloned)
+	}
+	si = &ServerInfo{
+		URL: "http://127.0.0.1",
+	}
+	cloned = si.MustJoin("path")
+	si.Method = "GET"
+	if cloned.Method == si.Method {
+		t.Fatal(cloned)
+	}
+	if cloned.URL != "http://127.0.0.1/path" {
+		t.Fatal(cloned)
+	}
+}
+
+func TestCloneServer(t *testing.T) {
+	var s = &Server{}
+	var cloned = s.Clone()
+	s.Method = "GET"
+	s.Client.Proxy = "proxy"
+	if cloned.Method == s.Method || cloned.Client.Proxy == s.Client.Proxy {
+		t.Fatal(cloned)
+	}
+	s = &Server{
+		ServerInfo: ServerInfo{
+			URL: "http://localhost",
+		},
+	}
+	cloned = s.MergeURL("http://127.0.0.1")
+	s.Method = "GET"
+	s.Client.Proxy = "proxy"
+	if cloned.Method == s.Method || cloned.Client.Proxy == s.Client.Proxy {
+		t.Fatal(cloned)
+	}
+	if cloned.URL != "http://127.0.0.1" {
+		t.Fatal(cloned)
+	}
+	s = &Server{
+		ServerInfo: ServerInfo{
+			URL: "http://127.0.0.1",
+		},
+	}
+	cloned = s.MustJoin("path")
+	s.Method = "GET"
+	s.Client.Proxy = "proxy"
+	if cloned.Method == s.Method || cloned.Client.Proxy == s.Client.Proxy {
+		t.Fatal(cloned)
+	}
+	if cloned.URL != "http://127.0.0.1/path" {
+		t.Fatal(cloned)
 	}
 }
