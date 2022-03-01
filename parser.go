@@ -76,6 +76,17 @@ func AsBytes(bytes *[]byte) Parser {
 	})
 }
 
+//Download create parser which parse givn byte slice from response.
+//You SHOULD NOT use BodyContent if you parsed response with Download Parser.
+//This parser is designed to download file.
+func Download(w io.Writer) Parser {
+	return ParserFunc(func(resp *Response) error {
+		defer resp.Response.Body.Close()
+		_, err := io.Copy(w, resp.Body)
+		return err
+	})
+}
+
 //AsString create parser which parse givn string from response.
 func AsString(str *string) Parser {
 	return ParserFunc(func(resp *Response) error {
