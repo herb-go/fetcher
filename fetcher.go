@@ -70,9 +70,7 @@ func New() *Fetcher {
 	}
 }
 
-//Fetch create new fetcher ,exec commands and fetch response.
-//Return http response and any error if raised.
-func Fetch(cmds ...Command) (*Response, error) {
+func request(cmds ...Command) (*Response, error) {
 	f := New()
 	return Do(f, cmds...)
 }

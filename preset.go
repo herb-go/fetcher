@@ -92,32 +92,37 @@ func (p *Preset) EndPoint(method string, suffix string) *Preset {
 //Fetch fetch request.
 //Preset and commands will exec on new fetcher by which fetching response.
 //Return http response and any error if raised.
+//Response returned will be parsed by defualt parser.
 func (p *Preset) Fetch(cmds ...Command) (*Response, error) {
 	return Fetch(p.Concat(cmds...))
 }
 
 //FetchWithBody fetch request with given body.
 //Return http response and any error if raised.
+//Response returned will be parsed by defualt parser.
 func (p *Preset) FetchWithBody(body io.Reader) (*Response, error) {
 	return p.Fetch(Body(body))
 }
 
 //FetchAndParse fetch request and prase response with given parser if no error raised.
 //Return response fetched and any error raised when fetching or parsing.
-func (p *Preset) FetchAndParse(preset Parser) (*Response, error) {
-	return FetchAndParse(p, preset)
+//Response returned will be parsed by given parser or defualt parser if nill given.
+func (p *Preset) FetchAndParse(parser Parser) (*Response, error) {
+	return FetchAndParse(p, parser)
 }
 
-//FetchWithBodyAndParse fetch request and prase response with given preset ,body and parser if no error raised.
+//FetchWithBodyAndParse fetch request and prase response with given parser ,body and parser if no error raised.
 //Return response fetched and any error raised when fetching or parsing.
-func (p *Preset) FetchWithBodyAndParse(body io.Reader, preset Parser) (*Response, error) {
-	return FetchWithBodyAndParse(p, body, preset)
+//Response returned will be parsed by given parser or defualt parser if nill given.
+func (p *Preset) FetchWithBodyAndParse(body io.Reader, parser Parser) (*Response, error) {
+	return FetchWithBodyAndParse(p, body, parser)
 }
 
-//FetchWithJSONBodyAndParse fetch request and prase response with given preset ,body as json and parser if no error raised.
+//FetchWithJSONBodyAndParse fetch request and prase response with given parser ,body as json and parser if no error raised.
 //Return response fetched and any error raised when fetching or parsing.
-func (p *Preset) FetchWithJSONBodyAndParse(body interface{}, preset Parser) (*Response, error) {
-	return FetchAndParse(p.Concat(JSONBody(body)), preset)
+//Response returned will be parsed by given parser or defualt parser if nill given.
+func (p *Preset) FetchWithJSONBodyAndParse(body interface{}, parser Parser) (*Response, error) {
+	return FetchAndParse(p.Concat(JSONBody(body)), parser)
 }
 
 //NewPreset create new preset
@@ -143,6 +148,13 @@ type ServerInfo struct {
 	Header http.Header
 	//Method http method
 	Method string
+}
+
+//MergeMethod clone and merge with given method
+func (s *ServerInfo) MergeMethod(method string) *ServerInfo {
+	si := s.Clone()
+	si.Method = method
+	return si
 }
 
 //MergeURL clone and merge with given url
@@ -221,6 +233,14 @@ func (s *Server) Clone() *Server {
 func (s *Server) MergeURL(url string) *Server {
 	return &Server{
 		ServerInfo: *s.ServerInfo.MergeURL(url),
+		Client:     *s.Client.Clone(),
+	}
+}
+
+//MergeURL clone and merge with given method
+func (s *Server) MergeMethod(method string) *Server {
+	return &Server{
+		ServerInfo: *s.ServerInfo.MergeMethod(method),
 		Client:     *s.Client.Clone(),
 	}
 }
